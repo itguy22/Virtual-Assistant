@@ -33,6 +33,16 @@ def take_command():
         return ""
     return command
 
+def check_reminders():
+    cursor = conn.execute("SELECT reminder, remind_time FROM reminders")
+    rows = cursor.fetchall()
+    if rows:
+        talk('You have the following reminders:')
+        for row in rows:
+            talk(f'Remind to {row[0]} at {row[1]}')
+    else:
+        talk('You have no reminders.')
+
 def run_assistant():
     command = take_command()
     try:
@@ -52,6 +62,8 @@ def run_assistant():
             conn.execute("INSERT INTO reminders (reminder, remind_time) VALUES (?, ?)",
                          (reminder, remind_time))
             conn.commit()
+        elif "check my reminders" in command:
+            check_reminders()
         else:
             talk('Please say the command again.')
     except Exception as e:
